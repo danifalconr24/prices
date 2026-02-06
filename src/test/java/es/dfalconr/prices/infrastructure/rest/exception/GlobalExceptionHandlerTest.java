@@ -5,6 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 
@@ -106,5 +108,119 @@ class GlobalExceptionHandlerTest {
             .contains("No price found");
         assertThat(response.getBody().status()).isEqualTo(404);
         assertThat(response.getBody().timestamp()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Should return 400 for MissingServletRequestParameterException")
+    void shouldReturn400ForMissingServletRequestParameter() {
+        // Given
+        MissingServletRequestParameterException exception =
+            new MissingServletRequestParameterException("productId", "Long");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            handler.handleMissingServletRequestParameter(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().status()).isEqualTo(400);
+    }
+
+    @Test
+    @DisplayName("Should include parameter name in missing parameter error message")
+    void shouldIncludeParameterNameInMissingParameterError() {
+        // Given
+        MissingServletRequestParameterException exception =
+            new MissingServletRequestParameterException("brandId", "Long");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            handler.handleMissingServletRequestParameter(exception);
+
+        // Then
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().message())
+            .contains("brandId")
+            .contains("Required parameter")
+            .contains("missing");
+    }
+
+    @Test
+    @DisplayName("Should return 400 for MethodArgumentTypeMismatchException")
+    void shouldReturn400ForMethodArgumentTypeMismatch() {
+        // Given
+        MethodArgumentTypeMismatchException exception =
+            new MethodArgumentTypeMismatchException(
+                "abc", Long.class, "productId", null, null);
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            handler.handleMethodArgumentTypeMismatch(exception);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().status()).isEqualTo(400);
+    }
+
+    @Test
+    @DisplayName("Should include invalid value and expected type in type mismatch error")
+    void shouldIncludeDetailsInTypeMismatchError() {
+        // Given
+        MethodArgumentTypeMismatchException exception =
+            new MethodArgumentTypeMismatchException(
+                "invalid-id", Long.class, "productId", null, null);
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            handler.handleMethodArgumentTypeMismatch(exception);
+
+        // Then
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().message())
+            .contains("invalid-id")
+            .contains("productId")
+            .contains("Long");
+    }
+
+    @Test
+    @DisplayName("Should handle MethodArgumentTypeMismatchException with null required type")
+    void shouldHandleTypeMismatchWithNullType() {
+        // Given
+        MethodArgumentTypeMismatchException exception =
+            new MethodArgumentTypeMismatchException(
+                "test", null, "param", null, null);
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            handler.handleMethodArgumentTypeMismatch(exception);
+
+        // Then
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().message())
+            .contains("test")
+            .contains("param")
+            .contains("unknown");
+    }
+
+    @Test
+    @DisplayName("Should include timestamp in missing parameter error response")
+    void shouldIncludeTimestampInMissingParameterError() {
+        // Given
+        LocalDateTime before = LocalDateTime.now();
+        MissingServletRequestParameterException exception =
+            new MissingServletRequestParameterException("productId", "Long");
+
+        // When
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+            handler.handleMissingServletRequestParameter(exception);
+        LocalDateTime after = LocalDateTime.now();
+
+        // Then
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().timestamp())
+            .isAfterOrEqualTo(before)
+            .isBeforeOrEqualTo(after);
     }
 }
