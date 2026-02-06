@@ -402,18 +402,32 @@
 					"response": []
 				},
 				{
-					"name": "Test 7 - Missing Required Parameter (400)",
+					"name": "Test 7 - Missing applicationDate Parameter (400)",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 400 or 500\", function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([400, 500]);",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
 									"});",
 									"",
-									"pm.test(\"Error response exists\", function () {",
-									"    pm.response.to.be.error;",
+									"pm.test(\"Error response has required fields\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData).to.have.property('timestamp');",
+									"});",
+									"",
+									"pm.test(\"Error status is 400\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Error message mentions missing parameter\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('applicationDate');",
+									"    pm.expect(jsonData.message).to.include('missing');",
 									"});"
 								],
 								"type": "text/javascript"
@@ -445,7 +459,7 @@
 								}
 							]
 						},
-						"description": "Query with missing applicationDate parameter. Expected: 400 BAD_REQUEST error (validation may vary depending on Spring configuration)."
+						"description": "Query with missing applicationDate parameter. Expected: 400 BAD_REQUEST with message 'Required parameter 'applicationDate' is missing'."
 					},
 					"response": []
 				},
@@ -460,8 +474,22 @@
 									"    pm.response.to.have.status(400);",
 									"});",
 									"",
-									"pm.test(\"Error response exists\", function () {",
-									"    pm.response.to.be.error;",
+									"pm.test(\"Error response has required fields\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData).to.have.property('timestamp');",
+									"});",
+									"",
+									"pm.test(\"Error status is 400\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Error message mentions invalid value and parameter\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('Invalid value');",
+									"    pm.expect(jsonData.message).to.include('applicationDate');",
 									"});"
 								],
 								"type": "text/javascript"
@@ -498,12 +526,272 @@
 								}
 							]
 						},
-						"description": "Query with invalid date format. Expected: 400 BAD_REQUEST error due to date parsing failure."
+						"description": "Query with invalid date format. Expected: 400 BAD_REQUEST with message 'Invalid value 'invalid-date-format' for parameter 'applicationDate'. Expected type: LocalDateTime'."
+					},
+					"response": []
+				},
+				{
+					"name": "Test 9 - Missing productId Parameter (400)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error response has required fields\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData).to.have.property('timestamp');",
+									"});",
+									"",
+									"pm.test(\"Error status is 400\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Error message mentions missing productId\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('productId');",
+									"    pm.expect(jsonData.message).to.include('missing');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/prices?applicationDate=2020-06-14T10:00:00&brandId=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"prices"
+							],
+							"query": [
+								{
+									"key": "applicationDate",
+									"value": "2020-06-14T10:00:00",
+									"description": "ISO 8601 LocalDateTime format"
+								},
+								{
+									"key": "brandId",
+									"value": "1",
+									"description": "Brand identifier"
+								}
+							]
+						},
+						"description": "Query with missing productId parameter. Expected: 400 BAD_REQUEST with message 'Required parameter 'productId' is missing'."
+					},
+					"response": []
+				},
+				{
+					"name": "Test 10 - Missing brandId Parameter (400)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error response has required fields\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData).to.have.property('timestamp');",
+									"});",
+									"",
+									"pm.test(\"Error status is 400\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Error message mentions missing brandId\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('brandId');",
+									"    pm.expect(jsonData.message).to.include('missing');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/prices?applicationDate=2020-06-14T10:00:00&productId=35455",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"prices"
+							],
+							"query": [
+								{
+									"key": "applicationDate",
+									"value": "2020-06-14T10:00:00",
+									"description": "ISO 8601 LocalDateTime format"
+								},
+								{
+									"key": "productId",
+									"value": "35455",
+									"description": "Product identifier"
+								}
+							]
+						},
+						"description": "Query with missing brandId parameter. Expected: 400 BAD_REQUEST with message 'Required parameter 'brandId' is missing'."
+					},
+					"response": []
+				},
+				{
+					"name": "Test 11 - Invalid productId Type (400)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error response has required fields\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData).to.have.property('timestamp');",
+									"});",
+									"",
+									"pm.test(\"Error status is 400\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Error message mentions invalid value and expected type\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('Invalid value');",
+									"    pm.expect(jsonData.message).to.include('productId');",
+									"    pm.expect(jsonData.message).to.include('Long');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/prices?applicationDate=2020-06-14T10:00:00&productId=invalid-id&brandId=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"prices"
+							],
+							"query": [
+								{
+									"key": "applicationDate",
+									"value": "2020-06-14T10:00:00",
+									"description": "ISO 8601 LocalDateTime format"
+								},
+								{
+									"key": "productId",
+									"value": "invalid-id",
+									"description": "Invalid productId - not a number"
+								},
+								{
+									"key": "brandId",
+									"value": "1",
+									"description": "Brand identifier"
+								}
+							]
+						},
+						"description": "Query with invalid productId type (string instead of Long). Expected: 400 BAD_REQUEST with message 'Invalid value 'invalid-id' for parameter 'productId'. Expected type: Long'."
+					},
+					"response": []
+				},
+				{
+					"name": "Test 12 - Invalid brandId Type (400)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error response has required fields\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData).to.have.property('timestamp');",
+									"});",
+									"",
+									"pm.test(\"Error status is 400\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Error message mentions invalid value and expected type\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('Invalid value');",
+									"    pm.expect(jsonData.message).to.include('brandId');",
+									"    pm.expect(jsonData.message).to.include('Long');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/prices?applicationDate=2020-06-14T10:00:00&productId=35455&brandId=abc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"prices"
+							],
+							"query": [
+								{
+									"key": "applicationDate",
+									"value": "2020-06-14T10:00:00",
+									"description": "ISO 8601 LocalDateTime format"
+								},
+								{
+									"key": "productId",
+									"value": "35455",
+									"description": "Product identifier"
+								},
+								{
+									"key": "brandId",
+									"value": "abc",
+									"description": "Invalid brandId - not a number"
+								}
+							]
+						},
+						"description": "Query with invalid brandId type (string instead of Long). Expected: 400 BAD_REQUEST with message 'Invalid value 'abc' for parameter 'brandId'. Expected type: Long'."
 					},
 					"response": []
 				}
 			],
-			"description": "Test requests for error scenarios including 404 (not found) and 400 (bad request) responses."
+			"description": "Test requests for error scenarios including 404 (not found) and 400 (bad request) responses. All error responses follow a consistent format with status, message, and timestamp fields."
 		}
 	],
 	"variable": [
