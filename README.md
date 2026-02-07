@@ -214,6 +214,8 @@ src/
 │   │   │   │   └── PriceResponse.java
 │   │   │   └── service/GetApplicablePriceService.java
 │   │   └── infrastructure/
+│   │       ├── config/
+│   │       │   └── OpenApiConfig.java
 │   │       ├── persistence/
 │   │       │   ├── entity/PriceJpaEntity.java
 │   │       │   ├── repository/PriceJpaRepository.java
