@@ -1,6 +1,7 @@
 package es.dfalconr.prices.infrastructure.rest.exception;
 
 import es.dfalconr.prices.domain.exception.PriceNotFoundException;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -61,5 +62,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
-    record ErrorResponse(int status, String message, LocalDateTime timestamp) {}
+    @Schema(description = "Error response")
+    public record ErrorResponse(
+        @Schema(description = "HTTP status code", example = "400")
+        int status,
+
+        @Schema(description = "Error message", example = "Required parameter 'productId' is missing")
+        String message,
+
+        @Schema(description = "Error timestamp", example = "2020-06-14T10:00:00")
+        LocalDateTime timestamp
+    ) {}
 }
